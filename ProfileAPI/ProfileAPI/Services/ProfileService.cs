@@ -22,7 +22,7 @@ namespace ProfileAPI.Services
             _profiles.Find(profile => true).ToList();
 
         public Profile Get(string upn) =>
-            _profiles.Find<Profile>(profile => profile.UserPrincipalName == upn).FirstOrDefault();
+            _profiles.Find<Profile>(profile => profile.userPrincipalName == upn).FirstOrDefault();
 
         public Profile Create(Profile profile)
         {
@@ -31,12 +31,12 @@ namespace ProfileAPI.Services
         }
 
         public void Update(string upn, Profile profileIn) =>
-            _profiles.ReplaceOne(profile => profile.UserPrincipalName == upn, profileIn);
+            _profiles.ReplaceOne(profile => profile.userPrincipalName == upn, profileIn);
 
         public void Remove(Profile profileIn) =>
-            _profiles.DeleteOne(profile => profile.UserPrincipalName == profileIn.UserPrincipalName);
+            _profiles.DeleteOne(profile => profile.userPrincipalName == profileIn.userPrincipalName);
 
         public void Remove(string upn) =>
-            _profiles.DeleteOne(profile => profile.UserPrincipalName == upn);
+            _profiles.DeleteOne(profile => profile.userPrincipalName == upn);
     }
 }
