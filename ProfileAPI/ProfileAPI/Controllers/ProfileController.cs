@@ -27,7 +27,7 @@ namespace ProfileAPI.Controllers
 
             foreach (var profile in mongoProfiles)
             {
-                var profileGraph = _peopleGraphService.Get(profile.UserPrincipalName);
+                var profileGraph = _peopleGraphService.Get(profile.userPrincipalName);
                 if (profileGraph != null)
                 {
                     profileGraph.Description = profile.Description;
@@ -88,7 +88,7 @@ namespace ProfileAPI.Controllers
                 return NotFound();
             }
 
-            _profileService.Remove(profile.UserPrincipalName);
+            _profileService.Remove(profile.userPrincipalName);
 
             return NoContent();
         }
