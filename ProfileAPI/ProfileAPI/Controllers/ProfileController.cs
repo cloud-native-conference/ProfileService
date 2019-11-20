@@ -73,6 +73,7 @@ namespace ProfileAPI.Controllers
                 return NotFound();
             }
 
+            profileIn.Id = profile.Id;
             _profileService.Update(upn, profileIn);
 
             return NoContent();
