@@ -1,33 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using ProfileAPI.Models;
-using ProfileAPI.Services;
-
-namespace ProfileAPI.Controllers
+﻿namespace ProfileAPI.Controllers
 {
-    [Route("[controller]")]
+    using System.Collections.Generic;
+    using Microsoft.AspNetCore.Mvc;
+    using ProfileAPI.Models;
+    using ProfileAPI.Services;
+
+    [Route("api/[controller]")]
     [ApiController]
     public class ProfileController: ControllerBase
     {
-        private readonly ProfileService _profileService;
-        private readonly PeopleGraphService _peopleGraphService;
+        private readonly ProfileService profileService;
+        private readonly PeopleGraphService peopleGraphService;
         
         public ProfileController(ProfileService profileService, PeopleGraphService peopleGraphService)
         {
-            _profileService = profileService;
-            _peopleGraphService = peopleGraphService;
+            this.profileService = profileService;
+            this.peopleGraphService = peopleGraphService;
         }
 
         [HttpGet]
         public ActionResult<List<Profile>> Get()
         {          
-            var mongoProfiles = _profileService.Get();
+            var mongoProfiles = profileService.Get();
             var resultProfiles = new List<Profile>(mongoProfiles.Count);
 
             foreach (var profile in mongoProfiles)
             {
-                var profileGraph = _peopleGraphService.Get(profile.userPrincipalName);
+                var profileGraph = peopleGraphService.Get(profile.UserPrincipalName);
                 if (profileGraph != null)
                 {
                     profileGraph.Description = profile.Description;
@@ -41,8 +40,8 @@ namespace ProfileAPI.Controllers
         [HttpGet("{upn}", Name = "GetProfile")]
         public ActionResult<Profile> Get(string upn)
         {
-            var profileMongo = _profileService.Get(upn);
-            var profileGraph = _peopleGraphService.Get(upn);
+            var profileMongo = profileService.Get(upn);
+            var profileGraph = peopleGraphService.Get(upn);
 
             if (profileMongo == null || profileGraph == null)
             {
@@ -58,7 +57,7 @@ namespace ProfileAPI.Controllers
         [HttpPost]
         public ActionResult<Profile> Create(Profile profile)
         {
-            _profileService.Create(profile);
+            profileService.Create(profile);
 
             return CreatedAtRoute("GetProfile", new { id = profile.Id.ToString() }, profile);
         }
@@ -66,7 +65,7 @@ namespace ProfileAPI.Controllers
         [HttpPut("{upn}")]
         public IActionResult Update(string upn, Profile profileIn)
         {
-            var profile = _profileService.Get(upn);
+            var profile = profileService.Get(upn);
 
             if (profile == null)
             {
@@ -74,7 +73,7 @@ namespace ProfileAPI.Controllers
             }
 
             profileIn.Id = profile.Id;
-            _profileService.Update(upn, profileIn);
+            profileService.Update(upn, profileIn);
 
             return NoContent();
         }
@@ -82,14 +81,14 @@ namespace ProfileAPI.Controllers
         [HttpDelete("{upn}")]
         public IActionResult Delete(string upn)
         {
-            var profile = _profileService.Get(upn);
+            var profile = profileService.Get(upn);
 
             if (profile == null)
             {
                 return NotFound();
             }
 
-            _profileService.Remove(profile.userPrincipalName);
+            profileService.Remove(profile.UserPrincipalName);
 
             return NoContent();
         }

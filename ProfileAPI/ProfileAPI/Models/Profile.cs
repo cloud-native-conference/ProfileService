@@ -1,28 +1,42 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace ProfileAPI.Models
+﻿namespace ProfileAPI.Models
 {
+    using MongoDB.Bson;
+    using MongoDB.Bson.Serialization.Attributes;
+    using Newtonsoft.Json;
+
     public class Profile
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public string userPrincipalName { get; set; }
+        [BsonElement("userPrincipalName")]
+        [JsonProperty("userPrincipalName")]
+        public string UserPrincipalName { get; set; }
 
-        public string displayName { get; set; }
+        [BsonElement("displayName")]
+        [JsonProperty("displayName")]
+        public string DisplayName { get; set; }
 
-        public string givenName { get; set; }
+        [BsonElement("givenName")]
+        [JsonProperty("givenName")]
+        public string GivenName { get; set; }
 
-        public string surname { get; set; }
+        [BsonElement("surname")]
+        [JsonProperty("surname")]
+        public string Surname { get; set; }
 
-        public string mail { get; set; }
+        [BsonElement("mail")]
+        [JsonProperty("mail")]
+        public string Mail { get; set; }
 
-        public string jobTitle { get; set; }
+        [BsonElement("jobTitle")]
+        [JsonProperty("jobTitle")]
+        public string JobTitle { get; set; }
 
-        public string officeLocation { get; set; }
+        [BsonElement("officeLocation")]
+        [JsonProperty("officeLocation")]
+        public string OfficeLocation { get; set; }
 
         public string Description { get; set; }
-
     }
 }
