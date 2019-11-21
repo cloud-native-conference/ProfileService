@@ -38,11 +38,6 @@
             }
         }
 
-        public async Task<Profile> GetAsync(string token, string upn)
-        {
-            return await GetProfileAsync(token, upn);
-        }
-
         public async Task<Profile> GetProfileAsync(string token, string upn)
         {
             try

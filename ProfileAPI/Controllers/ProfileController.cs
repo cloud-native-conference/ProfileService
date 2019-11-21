@@ -29,7 +29,7 @@
         public async Task<ActionResult<Profile>> GetAsync(string upn)
         {
             var token = Request.Headers["Authorization"];
-            var profileGraph = await peopleGraphService.GetAsync(token, upn);
+            var profileGraph = await peopleGraphService.GetProfileAsync(token, upn);
 
             return profileGraph;
         }
