@@ -1,68 +1,41 @@
 ﻿namespace ProfileAPI.Controllers
 {
-    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using ProfileAPI.Models;
     using ProfileAPI.Services;
 
     [Route("api/[controller]")]
     [ApiController]
-    public class ProfileController: ControllerBase
+    public class ProfileController : ControllerBase
     {
         private readonly ProfileService profileService;
         private readonly PeopleGraphService peopleGraphService;
-        
+
         public ProfileController(ProfileService profileService, PeopleGraphService peopleGraphService)
         {
             this.profileService = profileService;
             this.peopleGraphService = peopleGraphService;
         }
 
-        [HttpGet]
-        public ActionResult<List<Profile>> Get()
-        {          
-            var mongoProfiles = profileService.Get();
-            var resultProfiles = new List<Profile>(mongoProfiles.Count);
-
-            foreach (var profile in mongoProfiles)
-            {
-                var profileGraph = peopleGraphService.Get(profile.UserPrincipalName);
-                if (profileGraph != null)
-                {
-                    profileGraph.Description = profile.Description;
-                    resultProfiles.Add(profileGraph);
-                }
-            }
-
-            return resultProfiles;
-        }
-            
-        [HttpGet("{upn}", Name = "GetProfile")]
-        public ActionResult<Profile> Get(string upn)
+        [HttpGet("me")]
+        public async Task<ActionResult<Profile>> GetMe()
         {
-            var profileMongo = profileService.Get(upn);
-            var profileGraph = peopleGraphService.Get(upn);
-
-            if (profileMongo == null || profileGraph == null)
-            {
-                return NotFound();
-            }
-
-            var mergedProfile = profileGraph;
-            mergedProfile.Description = profileMongo.Description;
-
-            return mergedProfile;
+            var token = Request.Headers["Authorization"];
+            return await this.peopleGraphService.GetProfileAsync(token);
         }
 
-        [HttpPost]
-        public ActionResult<Profile> Create(Profile profile)
+        [HttpGet("users/{upn}", Name = "GetProfile")]
+        public async Task<ActionResult<Profile>> GetAsync(string upn)
         {
-            profileService.Create(profile);
+            var token = Request.Headers["Authorization"];
+            var profileGraph = await peopleGraphService.GetAsync(token, upn);
 
-            return CreatedAtRoute("GetProfile", new { id = profile.Id.ToString() }, profile);
+            return profileGraph;
         }
 
-        [HttpPut("{upn}")]
+
+        [HttpPut("users/{upn}")]
         public IActionResult Update(string upn, Profile profileIn)
         {
             var profile = profileService.Get(upn);
@@ -78,22 +51,7 @@
             return NoContent();
         }
 
-        [HttpDelete("{upn}")]
-        public IActionResult Delete(string upn)
-        {
-            var profile = profileService.Get(upn);
 
-            if (profile == null)
-            {
-                return NotFound();
-            }
-
-            profileService.Remove(profile.UserPrincipalName);
-
-            return NoContent();
-        }
-
-        
     }
 }
 

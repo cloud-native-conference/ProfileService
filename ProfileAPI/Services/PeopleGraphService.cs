@@ -3,49 +3,58 @@
     using Newtonsoft.Json;
     using ProfileAPI.Models;
     using System;
-    using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Threading.Tasks;
 
     public class PeopleGraphService
     {
         private HttpClient graphClient;
 
-        private const string URL = "https://graph.microsoft.com/v1.0/users";
-
-        // TODO: remove hardcoded token
-        private string token = "";
+        private const string URL = "https://graph.microsoft.com/";
 
         public PeopleGraphService(Configuration.IProfileDatabaseSettings settings)
         {
             graphClient = new HttpClient();
             graphClient.BaseAddress = new Uri(URL);
-            graphClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));         
+            graphClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public List<Profile> Get()
+        public async Task<Profile> GetProfileAsync(string token)
         {
-            return new List<Profile>();
+            graphClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token);
+            var response = await graphClient.GetAsync("/v1.0/me");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<Profile>(json);
+            }
+            else
+            {   
+                Console.WriteLine(response.StatusCode);
+                Console.WriteLine(response.ReasonPhrase);
+                throw new HttpRequestException(await response.Content.ReadAsStringAsync());
+            }
         }
 
-        public Profile Get(string upn)
+        public async Task<Profile> GetAsync(string token, string upn)
         {
-            return GetProfile(upn);
+            return await GetProfileAsync(token, upn);
         }
 
-        public Profile GetProfile(string upn)
+        public async Task<Profile> GetProfileAsync(string token, string upn)
         {
             try
             {
-                var url = URL + "('" + upn + "')";
-                graphClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                graphClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token);
 
-                var response = graphClient.GetAsync(new Uri(url)).Result;
+                var response = await graphClient.GetAsync("/v1.0/users/" + upn);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var json = response.Content.ReadAsStringAsync();
-                    var profile = JsonConvert.DeserializeObject<Profile>(json.Result);
+                    var json = await response.Content.ReadAsStringAsync();
+                    var profile = JsonConvert.DeserializeObject<Profile>(json);
                     return profile;
                 }
                 else
