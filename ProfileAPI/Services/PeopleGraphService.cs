@@ -20,7 +20,7 @@
             graphClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<Profile> GetProfileAsync(string token)
+        public async Task<ProfileGraph> GetProfileAsync(string token)
         {
             graphClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token);
             var response = await graphClient.GetAsync("/v1.0/me");
@@ -28,17 +28,17 @@
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<Profile>(json);
+                return JsonConvert.DeserializeObject<ProfileGraph>(json);
             }
             else
-            {   
+            {
                 Console.WriteLine(response.StatusCode);
                 Console.WriteLine(response.ReasonPhrase);
                 throw new HttpRequestException(await response.Content.ReadAsStringAsync());
             }
         }
 
-        public async Task<Profile> GetProfileAsync(string token, string upn)
+        public async Task<ProfileGraph> GetProfileAsync(string token, string upn)
         {
             try
             {
@@ -49,7 +49,7 @@
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var profile = JsonConvert.DeserializeObject<Profile>(json);
+                    var profile = JsonConvert.DeserializeObject<ProfileGraph>(json);
                     return profile;
                 }
                 else

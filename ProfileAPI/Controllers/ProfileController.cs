@@ -10,48 +10,46 @@
     public class ProfileController : ControllerBase
     {
         private readonly ProfileService profileService;
-        private readonly PeopleGraphService peopleGraphService;
 
-        public ProfileController(ProfileService profileService, PeopleGraphService peopleGraphService)
+        public ProfileController(ProfileService profileService)
         {
             this.profileService = profileService;
-            this.peopleGraphService = peopleGraphService;
         }
 
         [HttpGet("me")]
         public async Task<ActionResult<Profile>> GetMe()
         {
             var token = Request.Headers["Authorization"];
-            return await this.peopleGraphService.GetProfileAsync(token);
+            return await this.profileService.GetProfileAsync(token);
         }
 
-        [HttpGet("users/{upn}", Name = "GetProfile")]
-        public async Task<ActionResult<Profile>> GetAsync(string upn)
+        [HttpGet("users/{id}", Name = "GetProfile")]
+        public async Task<ActionResult<Profile>> GetAsync(string id)
         {
             var token = Request.Headers["Authorization"];
-            var profileGraph = await peopleGraphService.GetProfileAsync(token, upn);
-
-            return profileGraph;
-        }
-
-
-        [HttpPut("users/{upn}")]
-        public IActionResult Update(string upn, Profile profileIn)
-        {
-            var profile = profileService.Get(upn);
+            var profile = await this.profileService.GetProfileAsync(token, id);
 
             if (profile == null)
             {
                 return NotFound();
             }
 
-            profileIn.Id = profile.Id;
-            profileService.Update(upn, profileIn);
+            return profile;
+        }
+
+        [HttpPut("users/{id}")]
+        public async Task<IActionResult> UpdateAsync(string id, [FromBody] string description)
+        {
+            var token = Request.Headers["Authorization"];
+            var status = await profileService.UpdateAsync(token, id, description);
+
+            if (status == false)
+            {
+                return NotFound();
+            }
 
             return NoContent();
         }
-
-
     }
 }
 

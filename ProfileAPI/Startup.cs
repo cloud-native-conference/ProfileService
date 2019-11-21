@@ -28,9 +28,10 @@ namespace ProfileAPI
             services.AddSingleton<IProfileDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<ProfileDatabaseSettings>>().Value);
 
-            services.AddSingleton<ProfileService>();
             services.AddSingleton<PeopleGraphService>();
-
+            services.AddSingleton<MongoProfileService>();
+            services.AddSingleton<ProfileService>();
+            
             services.AddControllers();
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

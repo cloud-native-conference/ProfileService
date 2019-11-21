@@ -2,8 +2,11 @@
 {
     using Newtonsoft.Json;
 
-    public class Profile
+    public class ProfileGraph
     {
+        [JsonProperty("userPrincipalName")]
+        public string UserPrincipalName { get; set; }
+
         [JsonProperty("displayName")]
         public string DisplayName { get; set; }
 
@@ -21,7 +24,5 @@
 
         [JsonProperty("officeLocation")]
         public string OfficeLocation { get; set; }
-
-        public string Description { get; set; }
     }
 }
